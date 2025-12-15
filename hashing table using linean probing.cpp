@@ -2,21 +2,20 @@
 using namespace std;
 
 #define SIZE 11
+#define EMPTY -1
+#define DELETED -2
 
 int hashTable[SIZE];
 
-// Initialize hash table
 void init() {
     for (int i = 0; i < SIZE; i++)
-        hashTable[i] = -1;
+        hashTable[i] = EMPTY;
 }
 
-// Hash function (Mod 11)
 int hashFunction(int key) {
     return key % SIZE;
 }
 
-// Insert using Linear Probing
 void insertKey() {
     int key;
     cout << "Enter key to insert: ";
@@ -25,19 +24,18 @@ void insertKey() {
     int index = hashFunction(key);
     int start = index;
 
-    while (hashTable[index] != -1) {
+    while (hashTable[index] != EMPTY && hashTable[index] != DELETED) {
         index = (index + 1) % SIZE;
         if (index == start) {
-            cout << "Hash Table is FULL\n";
+            cout << "Hash table is FULL\n";
             return;
         }
     }
 
     hashTable[index] = key;
-    cout << "Key " << key << " inserted at slot " << index << endl;
+    cout << "Inserted at slot " << index << endl;
 }
 
-// Search using Linear Probing
 void searchKey() {
     int key;
     cout << "Enter key to search: ";
@@ -46,7 +44,7 @@ void searchKey() {
     int index = hashFunction(key);
     int start = index;
 
-    while (hashTable[index] != -1) {
+    while (hashTable[index] != EMPTY) {
         if (hashTable[index] == key) {
             cout << "Key found at slot " << index << endl;
             return;
@@ -59,18 +57,40 @@ void searchKey() {
     cout << "Key not found\n";
 }
 
-// Display hash table
+void deleteKey() {
+    int key;
+    cout << "Enter key to delete: ";
+    cin >> key;
+
+    int index = hashFunction(key);
+    int start = index;
+
+    while (hashTable[index] != EMPTY) {
+        if (hashTable[index] == key) {
+            hashTable[index] = DELETED;  // tombstone
+            cout << "Key deleted from slot " << index << endl;
+            return;
+        }
+        index = (index + 1) % SIZE;
+        if (index == start)
+            break;
+    }
+
+    cout << "Key not found\n";
+}
+
 void display() {
     cout << "\nHash Table:\n";
     for (int i = 0; i < SIZE; i++) {
-        if (hashTable[i] == -1)
+        if (hashTable[i] == EMPTY)
             cout << i << " : empty\n";
+        else if (hashTable[i] == DELETED)
+            cout << i << " : deleted\n";
         else
             cout << i << " : " << hashTable[i] << endl;
     }
 }
 
-// Main menu
 int main() {
     int choice;
     init();
@@ -79,29 +99,21 @@ int main() {
         cout << "\n--- Linear Probing Hashing (Mod 11) ---\n";
         cout << "1. Insert\n";
         cout << "2. Search\n";
-        cout << "3. Display\n";
-        cout << "4. Exit\n";
+        cout << "3. Delete\n";
+        cout << "4. Display\n";
+        cout << "5. Exit\n";
         cout << "Enter choice: ";
         cin >> choice;
 
         switch (choice) {
-            case 1:
-                insertKey();
-                break;
-            case 2:
-                searchKey();
-                break;
-            case 3:
-                display();
-                break;
-            case 4:
-                cout << "Exiting...\n";
-                break;
-            default:
-                cout << "Invalid choice\n";
+            case 1: insertKey(); break;
+            case 2: searchKey(); break;
+            case 3: deleteKey(); break;
+            case 4: display(); break;
+            case 5: cout << "Exiting...\n"; break;
+            default: cout << "Invalid choice\n";
         }
-
-    } while (choice != 4);
+    } while (choice != 5);
 
     return 0;
 }
