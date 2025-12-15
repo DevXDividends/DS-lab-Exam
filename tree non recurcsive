@@ -1,0 +1,170 @@
+#include <iostream>
+using namespace std;
+
+#define MAX 100
+
+// ================= TREE NODE =================
+class TreeNode {
+public:
+    int data;
+    TreeNode *left, *right;
+
+    TreeNode(int val) {
+        data = val;
+        left = right = nullptr;
+    }
+};
+
+// ================= USER DEFINED STACK =================
+class Stack {
+    TreeNode* arr[MAX];
+    int topIndex;
+
+public:
+    Stack() {
+        topIndex = -1;
+    }
+
+    bool isEmpty() {
+        return topIndex == -1;
+    }
+
+    bool isFull() {
+        return topIndex == MAX - 1;
+    }
+
+    void push(TreeNode* x) {
+        if (!isFull()) {
+            arr[++topIndex] = x;
+        }
+    }
+
+    TreeNode* pop() {
+        if (!isEmpty()) {
+            return arr[topIndex--];
+        }
+        return nullptr;
+    }
+
+    TreeNode* top() {
+        if (!isEmpty()) {
+            return arr[topIndex];
+        }
+        return nullptr;
+    }
+};
+
+// ================= INSERT (BST) =================
+TreeNode* AddNode(TreeNode* root, int val) {
+    if (!root)
+        return new TreeNode(val);
+
+    if (val < root->data)
+        root->left = AddNode(root->left, val);
+    else if (val > root->data)
+        root->right = AddNode(root->right, val);
+
+    return root;
+}
+
+// ================= INORDER (NR) =================
+void InorderNR(TreeNode* root) {
+    Stack stk;
+    TreeNode* curr = root;
+
+    while (curr || !stk.isEmpty()) {
+        while (curr) {
+            stk.push(curr);
+            curr = curr->left;
+        }
+        curr = stk.pop();
+        cout << curr->data << " ";
+        curr = curr->right;
+    }
+}
+
+// ================= PREORDER (NR) =================
+void PreorderNR(TreeNode* root) {
+    if (!root) return;
+
+    Stack stk;
+    stk.push(root);
+
+    while (!stk.isEmpty()) {
+        TreeNode* curr = stk.pop();
+        cout << curr->data << " ";
+
+        if (curr->right) stk.push(curr->right);
+        if (curr->left) stk.push(curr->left);
+    }
+}
+
+// ================= POSTORDER (NR) =================
+void PostorderNR(TreeNode* root) {
+    if (!root) return;
+
+    Stack st1, st2;
+    st1.push(root);
+
+    while (!st1.isEmpty()) {
+        TreeNode* curr = st1.pop();
+        st2.push(curr);
+
+        if (curr->left) st1.push(curr->left);
+        if (curr->right) st1.push(curr->right);
+    }
+
+    while (!st2.isEmpty()) {
+        cout << st2.pop()->data << " ";
+    }
+}
+
+// ================= MAIN =================
+int main() {
+    TreeNode* root = nullptr;
+    int choice, val;
+
+    while (true) {
+        cout << "\n=== NON-RECURSIVE TREE TRAVERSAL ===\n";
+        cout << "1. Insert Node\n";
+        cout << "2. Inorder (NR)\n";
+        cout << "3. Preorder (NR)\n";
+        cout << "4. Postorder (NR)\n";
+        cout << "5. Exit\n";
+        cout << "Enter choice: ";
+        cin >> choice;
+
+        switch (choice) {
+        case 1:
+            cout << "Enter value: ";
+            cin >> val;
+            root = AddNode(root, val);
+            break;
+
+        case 2:
+            cout << "Inorder: ";
+            InorderNR(root);
+            cout << endl;
+            break;
+
+        case 3:
+            cout << "Preorder: ";
+            PreorderNR(root);
+            cout << endl;
+            break;
+
+        case 4:
+            cout << "Postorder: ";
+            PostorderNR(root);
+            cout << endl;
+            break;
+
+        case 5:
+            cout << "Exiting...\n";
+            return 0;
+
+        default:
+            cout << "Invalid choice!\n";
+        }
+    }
+}
